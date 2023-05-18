@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getArtistByID, getArtistSongs, postSong } from '../api/requests';
+import { deleteSongByID, getArtistByID, getArtistSongs, postSong } from '../api/requests';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { Card } from 'antd';
 import { Helmet } from 'react-helmet';
@@ -49,8 +49,7 @@ const ArtistsDetail = () => {
     console.log('song data:', values)
     values.artistID = id;
     await postSong(values)
-    getArtistSongs(id).then((res)=>{
-      setSongs(res)})
+    setSongs([...songs,values])
     handleClose();
     actions.resetForm()
   }
@@ -90,6 +89,7 @@ const ArtistsDetail = () => {
                   <Typography>age: {artist.age}</Typography>
                   <Button variant='contained' color="primary"><Link style={{color:'white'}} to='/artists'>Go Back</Link></Button>
                 </Card>
+                <Button style={{marginTop:'30px', marginRight:'20px'}} variant='outlined' color='warning'><Link to={`http://localhost:3000/artist/edit/${artist._id}`} style={{color:'black', textDecoration:'none'}}>Edit {artist.name}</Link></Button>
                 <Button onClick={handleOpen} style={{marginTop:'30px'}} variant='outlined' color='info'>Add Song</Button>
               </Grid>
               <Grid item lg={6} md={6} sm={12}>
@@ -101,6 +101,7 @@ const ArtistsDetail = () => {
             <TableCell align="right">Title</TableCell>
             <TableCell align="right">Duration</TableCell>
             <TableCell align="right">Release Year</TableCell>
+            <TableCell align="right">Delete Song</TableCell>
            
           </TableRow>
         </TableHead>
@@ -116,6 +117,10 @@ const ArtistsDetail = () => {
               <TableCell align="right">{song.title}</TableCell>
               <TableCell align="right">{song.duration}</TableCell>
               <TableCell align="right">{song.releaseYear}</TableCell>
+              <TableCell align="right"><Button onClick={()=>{
+                deleteSongByID(song._id)
+                setSongs(songs.filter((x)=>x._id!==song._id))
+              }} variant='contained' color='error'>Delete</Button></TableCell>
              
             </TableRow>
           ))}

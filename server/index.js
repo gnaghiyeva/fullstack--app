@@ -124,25 +124,18 @@ app.post("/api/artists", async(req, res) => {
   res.status(201).send("created");
 });
 //put
-app.put("/api/artists/:id", (req, res) => {
+app.put("/api/artists/:id", async(req, res) => {
   const id = req.params.id;
   const { name, age, imageURL } = req.body;
-  const existedArtist = ARTISTS.find((x) => x.id == id);
+  const existedArtist = await ArtistModel.findByIdAndUpdate(id,{name:name, age:age, imageURL:imageURL})
   if (existedArtist == undefined) {
     res.status(404).send("artist not found!");
   } else {
-    if (name) {
-      existedArtist.name = name;
-    }
-    if (age) {
-      existedArtist.age = age;
-    }
-    if (imageURL) {
-      existedArtist.imageURL = imageURL;
-    }
-    res.status(200).send(`artist: ${existedArtist.name}`);
+    res.status(200).send(`${name} updated succesfully`);
   }
 });
+
+
 //SONGS ---------------------------------------------
 app.get("/api/songs/:id", async(req,res)=>{
   const id = req.params.id
@@ -181,6 +174,16 @@ app.post("/api/songs",async(req,res)=>{
   res.status(201).send("song created succesfully")
 })
 
+app.delete("/api/songs/:id", async(req,res)=>{
+  const id = req.params.id
+  const deletedSong= await SongModel.findByIdAndDelete(id);
+  if(!deletedSong){
+    res.status(404).send('song not found');
+  }
+  else{
+    res.status(203).send({data:deletedSong, message:'song deleted succesfully'})
+  }
+})
 
 PORT  = process.env.PORT;
 app.listen(PORT, () => {
